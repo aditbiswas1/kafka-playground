@@ -42,18 +42,28 @@ public class NameProducer {
         }
     }
 
-    public static void generateNames() throws ExecutionException, InterruptedException {
+    public static void generateNames() {
         Runnable generateName = () -> {
             init();
-            Faker faker = new Faker();
-            String value = faker.name().fullName();
-            ProducerRecord<String, String> record = new ProducerRecord<>(NAME_EXAMPLE_TOPIC,  null, value);
-            producer.send(record, callback);
+            int counter=0;
+            while(counter++ < 15){
+                Faker faker = new Faker();
+                String value = faker.name().fullName();
+                ProducerRecord<String, String> record = new ProducerRecord<>(NAME_EXAMPLE_TOPIC,  null, value);
+                producer.send(record, callback);
+                logger.info("sent batch");
+                try {
+                    Thread.sleep(6000);
+                } catch (InterruptedException e) {
+                    Thread.interrupted();
+                }
+            }
+
         };
         executorService.submit(generateName);
     }
 
-    private static void shutdown(){
+    public static void shutdown(){
         if (executorService != null) {
             executorService.shutdownNow();
             executorService = null;
