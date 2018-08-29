@@ -2,14 +2,11 @@ package util.dataGen;
 
 import com.github.javafaker.Faker;
 import org.apache.kafka.clients.producer.Callback;
-import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Properties;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -23,16 +20,7 @@ public class NameProducer {
 
     private static void init() {
         if (producer == null) {
-            logger.info("Initializing the producer");
-            Properties properties = new Properties();
-            properties.put("bootstrap.servers", "localhost:9092");
-            properties.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-            properties.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-            properties.put("acks", "1");
-            properties.put("retries", "3");
-
-            producer = new KafkaProducer<>(properties);
-
+            producer = new BaseKafkaProducer().getProducer();
             callback = (metadata, exception) -> {
                 if (exception != null) {
                     exception.printStackTrace();
